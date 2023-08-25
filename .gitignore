@@ -16,3 +16,11 @@ portal/tmp
 !/portal/log/.keep
 /portal/tmp
 .vagrant
+
+# Ignore images
+*.jpg
+*.png
+*.gif
+
+# Ignore .DS_Store
+.DS_Store

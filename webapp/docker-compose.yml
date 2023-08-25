@@ -11,7 +11,7 @@ services:
 
   app:
     # Go実装の場合は golang/ PHP実装の場合は php/
-    build: ruby/
+    build: python/
     environment:
       ISUCONP_DB_HOST: mysql
       ISUCONP_DB_PORT: 3306
@@ -24,6 +24,7 @@ services:
       - memcached
     volumes:
       - ./public:/home/public
+      - ./python:/home/webapp
     init: true
     deploy:
       resources:
