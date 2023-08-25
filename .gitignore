@@ -1,6 +1,7 @@
 vendor/
 portal/log
 portal/tmp
+alp
 
 ### Portal
 # Ignore bundler config.
@@ -22,5 +23,7 @@ portal/tmp
 *.png
 *.gif
 
-# Ignore .DS_Store
+# Ignore .cache,log
 .DS_Store
+*.log
+*.log.*

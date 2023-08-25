@@ -1,9 +1,10 @@
 services:
   nginx:
-    image: nginx:1.24
+    build: etc/nginx/
     volumes:
       - ./etc/nginx/conf.d:/etc/nginx/conf.d
       - ./public:/public
+      - ./etc/nginx/access.log:/var/log/nginx/access.log
     ports:
       - "80:80"
     links:
