@@ -43,6 +43,7 @@ services:
       - mysql:/var/lib/mysql
       - ./etc/my.cnf:/etc/my.cnf
       - ./sql:/docker-entrypoint-initdb.d
+      - ./etc/mysql-slow.log:/var/log/mysql/mysql-slow.log
     ports:
       - "3306:3306"
     deploy:
