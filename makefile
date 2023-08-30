@@ -1,3 +1,6 @@
+.PHONY: all
+all: restart
+
 ## docker関係
 .PHONY: up-no-cache
 up-no-cache:
@@ -10,7 +13,7 @@ up:
 
 .PHONY: down
 down:
-	cd webapp && docker-compose down
+	cd webapp && docker-compose down --volumes
 
 .PHONY: restart
 restart:
@@ -31,17 +34,19 @@ bench:
 		-t http://host.docker.internal \
 		-u /opt/go/userdata
 
+## ログ解析関係
 # アクセスログを解析する
 .PHONY: analyze-access-log
 analyze-access-log:
-	tail -n 100 $(LOG_FILE_NGINX) | \
+	cat $(LOG_FILE_NGINX) | \
 		./alp json \
 			-o count,method,uri,min,avg,max,sum \
-			--sort=sum -r
+			--sort=sum -r | \
+		less
 
 # スロークエリを解析する
-.PHONY: analyze-slow-log
-analyze-slow-log:
+.PHONY: analyze-query-log
+analyze-query-log:
 	docker pull matsuu/pt-query-digest
 	cat $(LOG_FILE_MYSQL) | \
 		docker run --rm -i matsuu/pt-query-digest --limit 10 | \
@@ -51,3 +56,13 @@ analyze-slow-log:
 .PHONY: stats
 stats:
 	cd webapp && docker stats
+
+# データベースの中身を確認する
+.PHONY: exec-mysql
+exec-mysql:
+	cd webapp && docker-compose exec mysql bash -c 'mysql -u root -proot isuconp'
+# mysqlコマンド集
+# テーブル一覧 SHOW TABLES;
+# テーブル構造 SHOW CREATE TABLE <テーブル名>;
+# クエリの実行計画 EXPLAIN <クエリ>;
+# インデックス作成 ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名>);
