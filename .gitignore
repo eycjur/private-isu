@@ -27,3 +27,6 @@ alp
 .DS_Store
 *.log
 *.log.*
+
+# Ignore .env
+.env

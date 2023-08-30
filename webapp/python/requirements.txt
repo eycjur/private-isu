@@ -1,3 +1,5 @@
 flask
 mysqlclient
 pymemcache
+gunicorn
+wsgi_lineprof

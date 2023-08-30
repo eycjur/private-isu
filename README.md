@@ -21,19 +21,23 @@
 
 ### 事前準備
 
-MySQLの初期データ、ベンチマーカー用の画像をダウンロードしておく。
-
 ```sh
+# MySQLの初期データのダウンロード
 cd webapp/sql
 curl -L -O https://github.com/catatsuy/private-isu/releases/download/img/dump.sql.bz2
 bunzip2 dump.sql.bz2
 cd ../..
 
+# ベンチマーカー用の画像をダウンロード
 cd benchmarker/userdata
 curl -L -O https://github.com/catatsuy/private-isu/releases/download/img/img.zip
 unzip img.zip
 rm img.zip
 cd ../..
+
+# envファイルの作成
+cd webapp
+cp .env.pub .env
 ```
 
 ### アプリの起動
@@ -44,6 +48,8 @@ make up
 ```
 
 ### ベンチマーカーの実行
+
+アプリ起動後にベンチマーカーを実行できます。
 
 ```sh
 make bench
@@ -59,6 +65,8 @@ make bench
 make analyze-access-log
 # スロークエリを解析する
 make analyze-slow-log
+# line-profileを解析する(.envでIS_PROFILE=1にすると有効になる)
+make analyze-line-profile
 ```
 
 ### デバッグ

@@ -9,6 +9,8 @@ import flask
 import jinja2
 import MySQLdb.cursors
 from pymemcache.client.base import Client as MemcacheClient
+from wsgi_lineprof.middleware import LineProfilerMiddleware
+from wsgi_lineprof.filters import FilenameFilter, TotalTimeSorter
 
 import pymc_session
 
@@ -428,6 +430,19 @@ def post_banned():
         cursor.execute(query, (1, id))
 
     return flask.redirect('/admin/banned')
+
+
+if int(os.environ.get("IS_PROFILE", "0")):
+    filters = [
+        FilenameFilter(os.path.basename(__file__)),
+        lambda stats: filter(lambda stat: stat.total_time > 0.001, stats),
+    ]
+    app.wsgi_app = LineProfilerMiddleware(
+        app.wsgi_app,
+        stream=open("profile.log", "a"),  # TODO: closeしていない
+        filters=filters,
+        async_stream=True,
+    )
 
 
 if __name__ == '__main__':

@@ -26,12 +26,17 @@ services:
     volumes:
       - ./public:/home/public
       - ./python:/home/webapp
+    env_file:
+      - .env
     init: true
     deploy:
       resources:
         limits:
           cpus: '1'
           memory: 1g
+    depends_on:
+      mysql:
+        condition: service_healthy
 
   mysql:
     image: mysql:8.0
@@ -51,6 +56,12 @@ services:
         limits:
           cpus: '1'
           memory: 1g
+    healthcheck:   # here
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
+      interval: 30s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
 
   memcached:
     image: memcached:1.6

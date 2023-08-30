@@ -29,11 +29,13 @@ logs:
 # 負荷テストを実行する
 LOG_FILE_NGINX = webapp/etc/nginx/access.log
 LOG_FILE_MYSQL = webapp/etc/mysql-slow.log
+LOG_FILE_LINE_PROFILE = webapp/python/profile.log
 .PHONY: bench
 bench:
 	echo "ログファイルを空にする"
 	: > $(LOG_FILE_NGINX)
 	: > $(LOG_FILE_MYSQL)
+	: > $(LOG_FILE_LINE_PROFILE)
 	cd benchmarker && docker build -t private-isu-benchmarker .
 	cd benchmarker && docker run --network host -i private-isu-benchmarker /opt/go/bin/benchmarker \
 		-t http://host.docker.internal \
@@ -56,6 +58,11 @@ analyze-query-log:
 	cat $(LOG_FILE_MYSQL) | \
 		docker run --rm -i matsuu/pt-query-digest --limit 10 | \
 		less
+
+# line-profileを解析する
+.PHONY: analyze-line-profile
+analyze-line-profile:
+	open http://0.0.0.0/wsgi_lineprof/
 
 # CPUやメモリの使用状況を確認する
 .PHONY: stats
