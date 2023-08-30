@@ -428,3 +428,7 @@ def post_banned():
         cursor.execute(query, (1, id))
 
     return flask.redirect('/admin/banned')
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080, debug=True)

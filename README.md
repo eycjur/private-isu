@@ -47,6 +47,7 @@ make up
 
 ```sh
 make bench
+# MySQLコンテナの初期データのロードには多少時間がかかるため、コンテナ起動直後は失敗することがあります
 ```
 
 ### ログの取得
@@ -59,3 +60,13 @@ make analyze-access-log
 # スロークエリを解析する
 make analyze-slow-log
 ```
+
+### デバッグ
+
+devcontainerを用いたPythonのデバッグが可能です。
+
+1. `make down`でコンテナを停止する
+1. コマンドパレットから`Dev Containers: Reopen in Container`を選択する
+2. F5キーでデバッグを開始する
+3. 適当なコードにブレークポイントを設定し、ブラウザからアクセスするとブレークポイントで停止する  
+   MySQLコンテナの初期データのロードには多少時間がかかります

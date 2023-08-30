@@ -20,6 +20,11 @@ restart:
 	@make --no-print-directory down
 	@make --no-print-directory up
 
+# docker-composeのログを出力する
+.PHONY: logs
+logs:
+	cd webapp && docker-compose logs -f
+
 ## 負荷テスト関係
 # 負荷テストを実行する
 LOG_FILE_NGINX = webapp/etc/nginx/access.log

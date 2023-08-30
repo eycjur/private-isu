@@ -1,0 +1,13 @@
+{
+  "configurations": [
+    {
+      "name": "Python: app.pyを実行",
+      "type": "python",
+      "request": "launch",
+      "module": "app",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": false,
+    },
+  ]
+}
