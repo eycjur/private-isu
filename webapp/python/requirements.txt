@@ -4,3 +4,5 @@ pymemcache
 gunicorn
 wsgi_lineprof
 python-dotenv
+black
+isort
