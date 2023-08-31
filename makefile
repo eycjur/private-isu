@@ -1,20 +1,23 @@
-.PHONY: all
-all: restart
+.PHONY: default
+default: help
 
 ## docker関係
-.PHONY: up-no-cache
-up-no-cache:
-	cd webapp && docker-compose build --no-cache
-	@make --no-print-directory up
-
+# docker-composeでコンテナを起動する
 .PHONY: up
 up:
 	cd webapp && docker-compose up --build
 
+# docker-composeでコンテナを停止する
 .PHONY: down
 down:
-	cd webapp && docker-compose down --volumes
+	cd webapp && docker-compose down
 
+# docker-composeでコンテナを停止し、まっさらな状態にする
+.PHONY: down-all
+down-all:
+	cd webapp && docker-compose down --rmi all --volumes --remove-orphans
+
+# docker-composeでコンテナを再起動する
 .PHONY: restart
 restart:
 	@make --no-print-directory down
@@ -26,10 +29,10 @@ logs:
 	cd webapp && docker-compose logs -f
 
 ## 負荷テスト関係
-# 負荷テストを実行する
 LOG_FILE_NGINX = webapp/etc/nginx/access.log
 LOG_FILE_MYSQL = webapp/etc/mysql-slow.log
 LOG_FILE_LINE_PROFILE = webapp/python/profile.log
+# 負荷テストを実行する
 .PHONY: bench
 bench:
 	echo "ログファイルを空にする"
@@ -78,3 +81,7 @@ exec-mysql:
 # テーブル構造 SHOW CREATE TABLE <テーブル名>;
 # クエリの実行計画 EXPLAIN <クエリ>;
 # インデックス作成 ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名>);
+
+.PHONY: help
+help:
+	@cat $(MAKEFILE_LIST) | python3 -u -c 'import sys, re; rx = re.compile(r"^[a-zA-Z0-9\-_]+:"); lines = [line.rstrip() for line in sys.stdin if not line.startswith(".PHONY")]; [print(f"""{line.split(":")[0]:20s}\t{prev.lstrip("# ")}""") if rx.search(line) and prev.startswith("# ") else print(f"""\n\033[92m{prev.lstrip("## ")}\033[0m""") if prev.startswith("## ") else "" for prev, line in zip([""] + lines, lines)]'
