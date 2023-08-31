@@ -26,13 +26,11 @@ services:
     volumes:
       - ./public:/home/public
       - ./python:/home/webapp
-    env_file:
-      - .env
     init: true
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: '2'
           memory: 1g
     depends_on:
       mysql:
@@ -54,7 +52,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: '2'
           memory: 1g
     healthcheck:   # here
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]

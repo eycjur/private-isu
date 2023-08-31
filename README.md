@@ -36,7 +36,7 @@ rm img.zip
 cd ../..
 
 # envファイルの作成
-cd webapp
+cd webapp/python
 cp .env.pub .env
 ```
 
@@ -54,6 +54,9 @@ make up
 ```sh
 make bench
 # MySQLコンテナの初期データのロードには多少時間がかかるため、コンテナ起動直後は失敗することがあります
+
+# ベンチマーカー実行中にコンテナごとの負荷を確認する
+make stats
 ```
 
 ### ログの取得
@@ -73,8 +76,9 @@ make analyze-line-profile
 
 devcontainerを用いたPythonのデバッグが可能です。
 
-1. `make down`でコンテナを停止する
-1. コマンドパレットから`Dev Containers: Reopen in Container`を選択する
-2. F5キーでデバッグを開始する
-3. 適当なコードにブレークポイントを設定し、ブラウザからアクセスするとブレークポイントで停止する  
+1. `make down`でコンテナを停止する  
+   デバッグするためには、appのportを解放する必要があります
+2. コマンドパレットから`Dev Containers: Reopen in Container`を選択する
+3. F5キーでデバッグを開始する
+4. 適当なコードにブレークポイントを設定し、ブラウザからアクセスするとブレークポイントで停止する  
    MySQLコンテナの初期データのロードには多少時間がかかります
