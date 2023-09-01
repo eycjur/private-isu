@@ -41,9 +41,13 @@ bench:
 	: > $(LOG_FILE_MYSQL)
 	: > $(LOG_FILE_LINE_PROFILE)
 	cd benchmarker && docker build -t private-isu-benchmarker .
-	cd benchmarker && docker run --network host -i private-isu-benchmarker /opt/go/bin/benchmarker \
-		-t http://host.docker.internal \
-		-u /opt/go/userdata
+	cd benchmarker && docker run \
+		--network host \
+		--name private-isu-benchmarker \
+		-i private-isu-benchmarker \
+		/opt/go/bin/benchmarker \
+			-t http://host.docker.internal \
+			-u /opt/go/userdata
 
 ## ログ解析関係
 # CPUやメモリの使用状況を確認する
@@ -86,11 +90,6 @@ analyze-line-profile-server:
 .PHONY: exec-mysql
 exec-mysql:
 	cd webapp && docker-compose exec mysql bash -c 'mysql -u root -proot isuconp'
-# mysqlコマンド集
-# テーブル一覧 SHOW TABLES;
-# テーブル構造 SHOW CREATE TABLE <テーブル名>;
-# クエリの実行計画 EXPLAIN <クエリ>;
-# インデックス作成 ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名>);
 
 .PHONY: help
 help:
