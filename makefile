@@ -92,6 +92,11 @@ analyze-python-log-server:
 exec-mysql:
 	cd webapp && docker-compose exec mysql bash -c 'mysql -u root -proot isuconp'
 
+# nginxの設定を再読み込みする
+.PHONY: reload-nginx
+reload-nginx:
+	cd webapp && docker-compose exec -it nginx nginx -s reload
+
 .PHONY: help
 help:
 	@cat $(MAKEFILE_LIST) | python3 -u -c 'import sys, re; rx = re.compile(r"^[a-zA-Z0-9\-_]+:"); lines = [line.rstrip() for line in sys.stdin if not line.startswith(".PHONY")]; [print(f"""{line.split(":")[0]:20s}\t{prev.lstrip("# ")}""") if rx.search(line) and prev.startswith("# ") else print(f"""\n\033[92m{prev.lstrip("## ")}\033[0m""") if prev.startswith("## ") else "" for prev, line in zip([""] + lines, lines)]'

@@ -434,6 +434,7 @@ def get_image(id, ext):
     cursor.execute("SELECT * FROM `posts` WHERE `id` = %s", (id,))
     post = cursor.fetchone()
 
+    # 新規アップロードは静的ファイルでないので、残しておく必要がある
     mime = post["mime"]
     if (
         ext == "jpg"
