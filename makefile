@@ -57,8 +57,8 @@ stats:
 	cd webapp && docker stats
 
 # アクセスログを解析する
-.PHONY: analyze-access-log
-analyze-access-log:
+.PHONY: analyze-nginx-log
+analyze-nginx-log:
 	docker build -t alp ./webapp/logs/nginx
 	cat $(LOG_FILE_NGINX) | \
 		docker run --rm -i alp alp json \
@@ -67,24 +67,24 @@ analyze-access-log:
 		less
 
 # スロークエリを解析する
-.PHONY: analyze-query-log
-analyze-query-log:
+.PHONY: analyze-mysql-log
+analyze-mysql-log:
 	docker pull matsuu/pt-query-digest
 	cat $(LOG_FILE_MYSQL) | \
 		docker run --rm -i matsuu/pt-query-digest --limit 10 | \
 		less
 
 # line-profileを解析する
-.PHONY: analyze-line-profile
-analyze-line-profile:
+.PHONY: analyze-python-log
+analyze-python-log:
 	docker build -t wlreporter ./webapp/logs/python
 	docker run --rm -i \
 		-v $(PWD)/webapp/logs/python:/tmp \
 		wlreporter wlreporter -f "/tmp/$(LOG_FILE_NAME_LINE_PROFILE)"
 	less "webapp/logs/python/$(LOG_FILE_NAME_LINE_PROFILE)_line_data.log"
 
-.PHONY: analyze-line-profile-server
-analyze-line-profile-server:
+.PHONY: analyze-python-log-server
+analyze-python-log-server:
 	open http://0.0.0.0/wsgi_lineprof/
 
 # データベースの中身を確認する

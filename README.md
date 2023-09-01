@@ -66,11 +66,11 @@ make stats
 
 ```sh
 # アクセスログを解析する
-make analyze-access-log
+make analyze-nginx-log
 # スロークエリを解析する
-make analyze-slow-log
+make analyze-mysql-log
 # line-profileを解析する(.envでIS_PROFILE=1にすると有効になる)
-make analyze-line-profile
+make analyze-python-log
 ```
 
 ### Dev Containerを用いたデバッグ
@@ -80,8 +80,10 @@ devcontainerを用いたPythonのデバッグが可能です。
 1. `make down`でコンテナを停止する  
    デバッグするためには、appのportを解放する必要があります
 2. コマンドパレットから`Dev Containers: Reopen in Container`を選択する
-3. F5キーでデバッグを開始する
-4. 適当なコードにブレークポイントを設定し、ブラウザからアクセスするとブレークポイントで停止する  
+3. .envのIS_PROFILEが0になっていることを確認  
+   line-profileが悪いさをしてブレークポイントで止まらなくなるため
+4. F5キーでデバッグを開始する
+5. 適当なコードにブレークポイントを設定し、ブラウザからアクセスするとブレークポイントで停止する  
    MySQLコンテナの初期データのロードには多少時間がかかります
 
 なお、devcontainer用のdocker-compose上でベンチマーカーを実行する場合は以下の手順に従ってください  
