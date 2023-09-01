@@ -42,6 +42,7 @@ bench:
 	: > $(LOG_FILE_LINE_PROFILE)
 	cd benchmarker && docker build -t private-isu-benchmarker .
 	cd benchmarker && docker run \
+		--rm \
 		--network host \
 		--name private-isu-benchmarker \
 		-i private-isu-benchmarker \

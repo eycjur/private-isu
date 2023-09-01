@@ -99,7 +99,7 @@ devcontainerを用いたPythonのデバッグが可能です。
 | 列の名前 | 説明 |
 | --- | --- |
 | CONTAINER ID と Name | コンテナの ID と名前 |
-| CPU % と MEM % | ホスト上の CPU とメモリを、コンテナがどれだけ使っているかパーセントで表示 |
+| CPU % と MEM % | ホスト上の CPU とメモリを、コンテナがどれだけ使っているかパーセントで表示(CPUはコア数x100%が上限) |
 | MEM USAGE / LIMIT | コンテナが使っている合計メモリ容量と、利用が許可されている合計メモリ容量 |
 | NET I/O | コンテナが自身のネットワークインターフェースを通して送受信したデータ容量 |
 | BLOCK I/O | コンテナがホスト上のブロックデバイスから読み書きしたデータ容量 |
@@ -185,9 +185,37 @@ SHOW CREATE TABLE <テーブル名>;
 
 #クエリの実行計画
 EXPLAIN <クエリ>;
+# id: SELECT識別子、実行順序を示してる
+# select_type: クエリの種類
+#   SIMPLE: サブクエリやユニオンが含まれていない単純なselect文
+#   SUBQUERY: select文のサブクエリに指定されているselect文
+#   PRIMARY: UNIONの1つめのselect文
+#   UNION: UNIONの２つめ以降のselect文
+#   UNION_RESULT: UNIONの無名一時テーブルから結果を取得するselect文
+# table: 出力の行で参照しているテーブルの名前
+# partitions: クエリが参照したパーティションテーブル。パーティションされていない場合はNULL
+# type: テーブルの結合方法
+#   ALL: フルテーブルスキャン。インデックスがはられていないため一番遅い  <改善を検討>
+#   index: フルインデックススキャン。インデックスがはられていること以外はALLと同じ、2番目に遅い  <改善を検討>
+#   range: indexを使用して、範囲検索
+#   const: PKもしくはuniqueキーを参照して検索、一番速い
+#   eq_ref: PKもしくはuniqueキーを参照して検索、constより遅い
+#   ref: 非ユニークインデックスを使用して検索
+# possible_keys: MySQLがクエリを実行する際に使用できるインデックス
+# key: MySQLが実際に使用したインデックス
+# key_len: MySQLが実際に使用したインデックスの長さ
+# ref: インデックスと比較されるカラムや値
+# rows: クエリ実行のためにMySQLが調査する行数
+# filtered: テーブル条件によってフィルタ処理される行数の割合
+# Extra: MySQLがクエリーを解決する方法に関する追加情報
+#   Using filesort: ソートを行うためにファイルソートを行っている
+#   Using temporary: クエリーを解決するために一時テーブルを作成している
+#   Using index: インデックスを使用している
+#   Using where: クエリーの結果を取得するためにWHERE句を使用している
 
 #インデックス作成
 ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名>);
+ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名1>, <カラム名2>);
 ```
 
 ### line-profiler
