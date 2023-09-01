@@ -274,8 +274,17 @@ def get_index():
     me = get_session_user()
 
     cursor = db().cursor()
+    # TODO: make_posts内でも再度userと結合する処理が走っている
     cursor.execute(
-        "SELECT `id`, `user_id`, `body`, `created_at`, `mime` FROM `posts` ORDER BY `created_at` DESC"
+        """
+        SELECT posts.id, posts.user_id, posts.body, posts.body, posts.mime
+        FROM `posts`
+        LEFT JOIN users ON posts.user_id = users.id
+        WHERE users.del_flg = 0
+        ORDER BY posts.created_at DESC
+        LIMIT %s
+        """,
+        (POSTS_PER_PAGE,),
     )
     posts = make_posts(cursor.fetchall())
 
