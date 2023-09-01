@@ -136,19 +136,26 @@ def make_posts(results, all_comments=False):
         )
         post["comment_count"] = cursor.fetchone()["count"]
 
-        query = (
-            "SELECT * FROM `comments` WHERE `post_id` = %s ORDER BY `created_at` DESC"
-        )
+        query = """
+            SELECT comments.id, comments.user_id, comments.comment, comments.created_at, 
+                JSON_OBJECT(
+                    'id', users.id,
+                    'account_name', users.account_name,
+                    'passhash', users.passhash,
+                    'authority', users.authority,
+                    'del_flg', users.del_flg,
+                    'created_at', users.created_at
+                ) AS user
+            FROM `comments`
+            LEFT JOIN users ON comments.user_id = users.id
+            WHERE comments.post_id = %s 
+            ORDER BY comments.created_at DESC
+            """
         if not all_comments:
             query += " LIMIT 3"
 
         cursor.execute(query, (post["id"],))
         comments = list(cursor)
-        for comment in comments:
-            cursor.execute(
-                "SELECT * FROM `users` WHERE `id` = %s", (comment["user_id"],)
-            )
-            comment["user"] = cursor.fetchone()
         comments.reverse()
         post["comments"] = comments
 
