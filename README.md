@@ -38,6 +38,7 @@ cd ../..
 # envファイルの作成
 cd webapp/python
 cp .env.pub .env
+cd ../..
 ```
 
 ### アプリの起動
@@ -72,7 +73,7 @@ make analyze-slow-log
 make analyze-line-profile
 ```
 
-### デバッグ
+### Dev Containerを用いたデバッグ
 
 devcontainerを用いたPythonのデバッグが可能です。
 
@@ -82,3 +83,10 @@ devcontainerを用いたPythonのデバッグが可能です。
 3. F5キーでデバッグを開始する
 4. 適当なコードにブレークポイントを設定し、ブラウザからアクセスするとブレークポイントで停止する  
    MySQLコンテナの初期データのロードには多少時間がかかります
+
+なお、devcontainer用のdocker-compose上でベンチマーカーを実行する場合は以下の手順に従ってください  
+（Pythonのプログラムとして起動すると、謎のエラーが発生するのでその対処法です）
+
+1. デバッグ中であれば一旦停止する
+2. devcontainer内で、`make run-server`を実行する
+3. ホスト上で、`make bench`を実行する

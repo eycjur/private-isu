@@ -45,6 +45,11 @@ bench:
 		-u /opt/go/userdata
 
 ## ログ解析関係
+# CPUやメモリの使用状況を確認する
+.PHONY: stats
+stats:
+	cd webapp && docker stats
+
 # アクセスログを解析する
 .PHONY: analyze-access-log
 analyze-access-log:
@@ -65,12 +70,15 @@ analyze-query-log:
 # line-profileを解析する
 .PHONY: analyze-line-profile
 analyze-line-profile:
-	open http://0.0.0.0/wsgi_lineprof/
+	cd webapp && \
+		docker-compose exec app sh -c '\
+			wlreporter -f "$(shell basename $(LOG_FILE_LINE_PROFILE))" && \
+			less "$(shell basename $(LOG_FILE_LINE_PROFILE))_line_data.log" \
+		'
 
-# CPUやメモリの使用状況を確認する
-.PHONY: stats
-stats:
-	cd webapp && docker stats
+.PHONY: analyze-line-profile-server
+analyze-line-profile-server:
+	open http://0.0.0.0/wsgi_lineprof/
 
 # データベースの中身を確認する
 .PHONY: exec-mysql
