@@ -404,21 +404,25 @@ def post_index():
         flask.flash("投稿できる画像形式はjpgとpngとgifだけです")
         return flask.redirect("/")
 
-    with tempfile.TemporaryFile() as tempf:
-        file.save(tempf)
-        tempf.flush()
-
-        if tempf.tell() > UPLOAD_LIMIT:
-            flask.flash("ファイルサイズが大きすぎます")
-            return flask.redirect("/")
-
-        tempf.seek(0)
-        imgdata = tempf.read()
-
     query = "INSERT INTO `posts` (`user_id`, `mime`, `imgdata`, `body`) VALUES (%s,%s,%s,%s)"
     cursor = db().cursor()
-    cursor.execute(query, (me["id"], mime, imgdata, flask.request.form.get("body")))
+    cursor.execute(query, (me["id"], mime, "".encode(), flask.request.form.get("body")))
     pid = cursor.lastrowid
+
+    if mime == "image/jpeg":
+        img_ext = ".jpg"
+    elif mime == "image/png":
+        img_ext = ".png"
+    elif mime == "image/gif":
+        img_ext = ".gif"
+
+    # idはidカラムの最大値
+    query = f"SELECT MAX(`id`) as max_id FROM `posts`"
+    cursor = db().cursor()
+    cursor.execute(query)
+    max_id_value = cursor.fetchone()["max_id"]
+    file.save(f"/home/public/image/{max_id_value}{img_ext}")
+
     return flask.redirect("/posts/%d" % pid)
 
 
