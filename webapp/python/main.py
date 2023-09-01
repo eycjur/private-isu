@@ -507,7 +507,7 @@ if int(os.environ.get("IS_PROFILE", "0")):
     ]
     app.wsgi_app = LineProfilerMiddleware(
         app.wsgi_app,
-        stream=open("profile.log", "a"),  # TODO: closeしていない
+        stream=open("/var/log/python/profile.log", "a"),  # TODO: closeしていない
         filters=filters,
         async_stream=True,
     )

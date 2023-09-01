@@ -4,7 +4,7 @@ services:
     volumes:
       - ./etc/nginx/conf.d:/etc/nginx/conf.d
       - ./public:/public
-      - ./etc/nginx/access.log:/var/log/nginx/access.log
+      - ./logs/nginx/access.log:/var/log/nginx/access.log
     ports:
       - "80:80"
     links:
@@ -26,6 +26,7 @@ services:
     volumes:
       - ./public:/home/public
       - ./python:/home/webapp
+      - ./logs/python/profile.log:/var/log/python/profile.log
     init: true
     deploy:
       resources:
@@ -46,7 +47,7 @@ services:
       - mysql:/var/lib/mysql
       - ./etc/my.cnf:/etc/my.cnf
       - ./sql:/docker-entrypoint-initdb.d
-      - ./etc/mysql-slow.log:/var/log/mysql/mysql-slow.log
+      - ./logs/mysql/mysql-slow.log:/var/log/mysql/mysql-slow.log
     ports:
       - "3306:3306"
     deploy:

@@ -29,9 +29,10 @@ logs:
 	cd webapp && docker-compose logs -f
 
 ## 負荷テスト関係
-LOG_FILE_NGINX = webapp/etc/nginx/access.log
-LOG_FILE_MYSQL = webapp/etc/mysql-slow.log
-LOG_FILE_LINE_PROFILE = webapp/python/profile.log
+LOG_FILE_NGINX = webapp/logs/nginx/access.log
+LOG_FILE_MYSQL = webapp/logs/mysql/mysql-slow.log
+LOG_FILE_LINE_PROFILE = webapp/logs/python/profile.log
+LOG_FILE_NAME_LINE_PROFILE = $(shell basename $(LOG_FILE_LINE_PROFILE))
 # 負荷テストを実行する
 .PHONY: bench
 bench:
@@ -53,8 +54,9 @@ stats:
 # アクセスログを解析する
 .PHONY: analyze-access-log
 analyze-access-log:
+	docker build -t alp ./webapp/logs/nginx
 	cat $(LOG_FILE_NGINX) | \
-		./alp json \
+		docker run --rm -i alp alp json \
 			-o count,method,uri,min,avg,max,sum \
 			--sort=sum -r | \
 		less
@@ -70,11 +72,11 @@ analyze-query-log:
 # line-profileを解析する
 .PHONY: analyze-line-profile
 analyze-line-profile:
-	cd webapp && \
-		docker-compose exec app sh -c '\
-			wlreporter -f "$(shell basename $(LOG_FILE_LINE_PROFILE))" && \
-			less "$(shell basename $(LOG_FILE_LINE_PROFILE))_line_data.log" \
-		'
+	docker build -t wlreporter ./webapp/logs/python
+	docker run --rm -i \
+		-v $(PWD)/webapp/logs/python:/tmp \
+		wlreporter wlreporter -f "/tmp/$(LOG_FILE_NAME_LINE_PROFILE)"
+	less "webapp/logs/python/$(LOG_FILE_NAME_LINE_PROFILE)_line_data.log"
 
 .PHONY: analyze-line-profile-server
 analyze-line-profile-server:
