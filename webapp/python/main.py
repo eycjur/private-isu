@@ -40,12 +40,17 @@ def config():
     return _config
 
 
+_db = None
+
+
 def db():
-    conf = config()["db"].copy()
-    conf["charset"] = "utf8mb4"
-    conf["cursorclass"] = MySQLdb.cursors.DictCursor
-    conf["autocommit"] = True
-    _db = MySQLdb.connect(**conf)
+    global _db
+    if _db is None:
+        conf = config()["db"].copy()
+        conf["charset"] = "utf8mb4"
+        conf["cursorclass"] = MySQLdb.cursors.DictCursor
+        conf["autocommit"] = True
+        _db = MySQLdb.connect(**conf)
     return _db
 
 
