@@ -9,4 +9,4 @@ COPY requirements.freeze /home/webapp
 WORKDIR /home/webapp
 RUN pip install -r requirements.freeze
 COPY . /home/webapp
-CMD ["gunicorn", "main:app", "-b", "0.0.0.0:8080", "--reload", "--log-file", "-", "--access-logfile", "-"]
+CMD ["gunicorn", "main:app", "-b", "0.0.0.0:8080", "--reload", "--log-file", "-", "--access-logfile", "-" "-w", "8"]
