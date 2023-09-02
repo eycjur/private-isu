@@ -31,15 +31,16 @@ logs:
 ## 負荷テスト関係
 LOG_FILE_NGINX = webapp/logs/nginx/access.log
 LOG_FILE_MYSQL = webapp/logs/mysql/mysql-slow.log
-LOG_FILE_LINE_PROFILE = webapp/logs/python/profile.log
-LOG_FILE_NAME_LINE_PROFILE = $(shell basename $(LOG_FILE_LINE_PROFILE))
+LOG_FILE_PYTHON = webapp/logs/python/profile.log
+LOG_FILE_PYTHON_WLREPORTER = webapp/logs/python/profile_wlreporter.log
 # 負荷テストを実行する
 .PHONY: bench
 bench:
 	echo "ログファイルを空にする"
 	: > $(LOG_FILE_NGINX)
 	: > $(LOG_FILE_MYSQL)
-	: > $(LOG_FILE_LINE_PROFILE)
+	: > $(LOG_FILE_PYTHON)
+	: > $(LOG_FILE_PYTHON_WLREPORTER)
 	cd benchmarker && docker build -t private-isu-benchmarker .
 	cd benchmarker && docker run \
 		--rm \
@@ -74,17 +75,26 @@ analyze-mysql-log:
 		docker run --rm -i matsuu/pt-query-digest --limit 10 | \
 		less
 
-# line-profileを解析する
+# pythonのprofileを解析する
 .PHONY: analyze-python-log
 analyze-python-log:
-	docker build -t wlreporter ./webapp/logs/python
-	docker run --rm -i \
-		-v $(PWD)/webapp/logs/python:/tmp \
-		wlreporter wlreporter -f "/tmp/$(LOG_FILE_NAME_LINE_PROFILE)"
-	less "webapp/logs/python/$(LOG_FILE_NAME_LINE_PROFILE)_line_data.log"
+	docker build -t snakeviz ./webapp/logs/python
+	docker run --rm -it \
+		-v $(shell pwd)/$(LOG_FILE_PYTHON):/tmp/$(LOG_FILE_PYTHON) \
+		-p 9111:9111 \
+		snakeviz snakeviz -s -H 0.0.0.0 -p 9111 "/tmp/$(LOG_FILE_PYTHON)"
 
-.PHONY: analyze-python-log-server
-analyze-python-log-server:
+.PHONY: analyze-python-log-wlreporter
+analyze-python-log-wlreporter:
+	docker build -t wlreporter ./webapp/logs/python \
+		-f ./webapp/logs/python/Dockerfile.wlreporter
+	docker run --rm -i \
+		-v $(shell pwd)/$(shell dirname LOG_FILE_PYTHON_WLREPORTER):/tmp/$(shell dirname LOG_FILE_PYTHON_WLREPORTER) \
+		wlreporter wlreporter -f "/tmp/$(LOG_FILE_PYTHON_WLREPORTER)"
+	less "$(LOG_FILE_PYTHON_WLREPORTER)_line_data.log"
+
+.PHONY: analyze-python-log-wlreporter-server
+analyze-python-log-wlreporter-server:
 	open http://0.0.0.0/wsgi_lineprof/
 
 # データベースの中身を確認する

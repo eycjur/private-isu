@@ -32,6 +32,7 @@ services:
       - ./public:/home/public
       - ./python:/home/webapp
       - ./logs/python/profile.log:/var/log/python/profile.log
+      - ./logs/python/profile_wlreporter.log:/var/log/python/profile_wlreporter.log
     init: true
     deploy:
       resources:

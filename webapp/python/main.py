@@ -10,12 +10,12 @@ import jinja2
 import MySQLdb.cursors
 from dotenv import load_dotenv
 from pymemcache.client.base import Client as MemcacheClient
+from werkzeug.middleware.profiler import ProfilerMiddleware
 from wsgi_lineprof.filters import FilenameFilter, TotalTimeSorter
 from wsgi_lineprof.middleware import LineProfilerMiddleware
 
 import pymc_session
 
-load_dotenv()
 UPLOAD_LIMIT = 10 * 1024 * 1024  # 10mb
 POSTS_PER_PAGE = 20
 
@@ -521,17 +521,27 @@ def post_banned():
     return flask.redirect("/admin/banned")
 
 
-if int(os.environ.get("IS_PROFILE", "0")):
-    filters = [
-        FilenameFilter(__file__),
-        lambda stats: filter(lambda stat: stat.total_time > 0.1, stats),
-    ]
-    app.wsgi_app = LineProfilerMiddleware(
-        app.wsgi_app,
-        stream=open("/var/log/python/profile.log", "a"),  # TODO: closeしていない
-        filters=filters,
-        async_stream=True,
-    )
+# werkzeugを用いたプロファイリング
+app.config["PROFILE"] = True
+app.wsgi_app = ProfilerMiddleware(
+    app.wsgi_app,
+    stream=None,
+    profile_dir="/var/log/python/",
+    filename_format="profile.log",
+)
+
+# # line_profilerを用いたラインプロファイリング
+# # デバッグと併用できないので、利用は非推奨
+# filters = [
+#     FilenameFilter(__file__),
+#     lambda stats: filter(lambda stat: stat.total_time > 0.1, stats),
+# ]
+# app.wsgi_app = LineProfilerMiddleware(
+#     app.wsgi_app,
+#     stream=open("/var/log/python/profile_wlreporter.log", "a"),  # TODO: closeしていない
+#     filters=filters,
+#     async_stream=True,
+# )
 
 
 if __name__ == "__main__":
