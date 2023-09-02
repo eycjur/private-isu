@@ -366,12 +366,28 @@ def get_posts():
     if max_created_at:
         max_created_at = _parse_iso8601(max_created_at)
         cursor.execute(
-            "SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` WHERE `created_at` <= %s ORDER BY `created_at` DESC",
-            (max_created_at,),
+            """
+            SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at
+            FROM `posts`
+            LEFT JOIN users ON posts.user_id = users.id
+            WHERE users.del_flg = 0
+                and posts.created_at <= %s
+            ORDER BY posts.created_at DESC
+            LIMIT %s
+            """,
+            (max_created_at, POSTS_PER_PAGE),
         )
     else:
         cursor.execute(
-            "SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` WHERE ORDER BY `created_at` DESC"
+            """
+            SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at
+            FROM `posts`
+            LEFT JOIN users ON posts.user_id = users.id
+            WHERE users.del_flg = 0
+            ORDER BY posts.created_at DESC
+            LIMIT %s
+            """,
+            (POSTS_PER_PAGE,),
         )
     results = cursor.fetchall()
     posts = make_posts(results)
