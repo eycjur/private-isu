@@ -9,6 +9,11 @@ services:
       - "80:80"
     links:
       - app
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1g
 
   app:
     # Go実装の場合は golang/ PHP実装の場合は php/
@@ -64,6 +69,22 @@ services:
 
   memcached:
     image: memcached:1.6
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1g
+
+  # newrelic-infra:
+  #   build: logs/newrelic/
+  #   cap_add:
+  #     - SYS_PTRACE
+  #   network_mode: host
+  #   privileged: true
+  #   pid: host
+  #   volumes:
+  #     - "/:/host:ro"
+  #     - "/var/run/docker.sock:/var/run/docker.sock"
 
 volumes:
   mysql:

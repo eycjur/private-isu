@@ -233,3 +233,7 @@ ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名1>,
 | total_time | 合計時間(1e-06ms) |
 
 - https://github.com/denzow/wsgi_lineprof_reporter
+
+### New Relic
+- https://docs.newrelic.com/jp/install/python/
+- https://docs.newrelic.com/docs/infrastructure/install-infrastructure-agent/linux-installation/container-infrastructure-monitoring/
