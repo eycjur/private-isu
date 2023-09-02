@@ -74,7 +74,7 @@ def memcache():
     global _mcclient
     if _mcclient is None:
         _mcclient = MemcacheClient(
-            ("memcached", 11211), no_delay=True, default_noreply=False
+            ("memcached", 11211), no_delay=True, default_noreply=False, encoding="utf-8"
         )
     return _mcclient
 
