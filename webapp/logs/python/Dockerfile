@@ -1,5 +1,5 @@
 FROM python:3.10-alpine
 
-RUN python -m pip install wlreporter
+RUN python -m pip install snakeviz
 
-CMD ["wlreporter", "-v"]
+CMD ["snakeviz", "-h"]
