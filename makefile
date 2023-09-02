@@ -36,11 +36,13 @@ LOG_FILE_PYTHON_WLREPORTER = webapp/logs/python/profile_wlreporter.log
 # 負荷テストを実行する
 .PHONY: bench
 bench:
-	echo "ログファイルを空にする"
+	# "ログファイルを空にする"
 	: > $(LOG_FILE_NGINX)
 	: > $(LOG_FILE_MYSQL)
 	: > $(LOG_FILE_PYTHON)
 	: > $(LOG_FILE_PYTHON_WLREPORTER)
+
+	# "負荷テストを実行する"
 	cd benchmarker && docker build -t private-isu-benchmarker .
 	cd benchmarker && docker run \
 		--rm \
@@ -96,6 +98,17 @@ analyze-python-log-wlreporter:
 .PHONY: analyze-python-log-wlreporter-server
 analyze-python-log-wlreporter-server:
 	open http://0.0.0.0/wsgi_lineprof/
+
+# memcachedの情報を取得
+.PHONY: analyze-memcached-stats
+analyze-memcached-stats:
+	( \
+		echo open localhost 11211 && \
+		sleep 1 && \
+		echo stats && \
+		sleep 1 && \
+		echo "exit" \
+	) | telnet | less
 
 # データベースの中身を確認する
 .PHONY: exec-mysql

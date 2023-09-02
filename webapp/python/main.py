@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 import pathlib
 import re
@@ -74,7 +75,7 @@ def memcache():
     global _mcclient
     if _mcclient is None:
         _mcclient = MemcacheClient(
-            ("memcached", 11211), no_delay=True, default_noreply=False
+            ("memcached", 11211), no_delay=True, default_noreply=False, encoding="utf-8"
         )
     return _mcclient
 
@@ -129,6 +130,7 @@ def get_session_user():
 def make_posts(results, all_comments=False):
     posts = []
     cursor = db().cursor()
+
     for post in results:
         cursor.execute(
             "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = %s",
@@ -136,28 +138,37 @@ def make_posts(results, all_comments=False):
         )
         post["comment_count"] = cursor.fetchone()["count"]
 
-        query = """
-            SELECT comments.id, comments.user_id, comments.comment, comments.created_at, 
-                JSON_OBJECT(
-                    'id', users.id,
-                    'account_name', users.account_name,
-                    'passhash', users.passhash,
-                    'authority', users.authority,
-                    'del_flg', users.del_flg,
-                    'created_at', users.created_at
-                ) AS user
-            FROM `comments`
-            LEFT JOIN users ON comments.user_id = users.id
-            WHERE comments.post_id = %s 
-            ORDER BY comments.created_at DESC
-            """
-        if not all_comments:
-            query += " LIMIT 3"
+        comments_cache = memcache().get("post_comments_%d" % post["id"], None)
+        if comments_cache is not None:
+            post["comments"] = comments_cache
+        else:
+            query = """
+                SELECT comments.id, comments.user_id, comments.comment, comments.created_at, 
+                    JSON_OBJECT(
+                        'id', users.id,
+                        'account_name', users.account_name,
+                        'passhash', users.passhash,
+                        'authority', users.authority,
+                        'del_flg', users.del_flg,
+                        'created_at', users.created_at
+                    ) AS user
+                FROM `comments`
+                LEFT JOIN users ON comments.user_id = users.id
+                WHERE comments.post_id = %s 
+                ORDER BY comments.created_at DESC
+                """
+            if not all_comments:
+                query += " LIMIT 3"
 
-        cursor.execute(query, (post["id"],))
-        comments = list(cursor)
-        comments.reverse()
-        post["comments"] = comments
+            cursor.execute(query, (post["id"],))
+            comments = list(cursor)
+            comments.reverse()
+            post["comments"] = comments
+            memcache().set(
+                f'post_comments_{post["id"]}_{all_comments}',
+                comments,
+                expire=10,
+            )
 
         cursor.execute("SELECT * FROM `users` WHERE `id` = %s", (post["user_id"],))
         post["user"] = cursor.fetchone()
