@@ -65,12 +65,15 @@ make stats
 ベンチマーカーを実行後に解析を行うことができます。
 
 ```sh
-# アクセスログを解析する
+# nginxのアクセスログを解析する
 make analyze-nginx-log
-# スロークエリを解析する
+# mysqlのスロークエリを解析する
 make analyze-mysql-log
-# line-profileを解析する(.envでIS_PROFILE=1にすると有効になる)
+# pythonのprofilerを解析する
 make analyze-python-log
+# memcachedの情報を取得する
+#   ベンチマーク前にmake restart-memcachedを実行することを推奨
+make analyze-memcached-stats
 ```
 
 ### Dev Containerを用いたデバッグ
@@ -220,9 +223,24 @@ ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名>);
 ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名1>, <カラム名2>);
 ```
 
-### line-profiler
+### Python profiler
 
-![line_profiler](img/line_profiler.png)
+![profiler](img/python_profiler.png)
+
+| 項目 | 意味 |
+| --- | --- |
+| ncalls | 呼び出し回数 |
+| tottime | 関数の処理時間の合計(呼び出した関数の処理時間は除外) |
+| percall | tottimeをncallsで割った値。一回の実行にかかる平均時間 |
+| cumtime | 関数の処理時間の合計(呼び出した関数の処理時間も含める) |
+| percall | cumtimeをncallsで割った値。一回の実行にかかる平均時間 |
+| filename:lineno(function) | ファイル名、行番号、関数名 |
+
+- https://tech.morikatron.ai/entry/2020/03/06/100000
+
+### Python wlreporter（line profiler）
+
+![wlreporter](img/python_wlreporter.png)
 
 | column | mean |
 | --- | --- |
@@ -234,6 +252,32 @@ ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名1>,
 
 - https://github.com/denzow/wsgi_lineprof_reporter
 
+### memcached stats
+
+![memcached_stats](img/memcached_stats.png)
+
+代表的な項目のみ表示
+
+| 項目名 | 説明 |
+| --- | --- |
+| cmd_get | GETコマンドの累積発行数 |
+| cmd_set | SETコマンドの累積発行数 |
+| get_hits | GETコマンドがキーにhitした回数 |
+| get_misses | GETコマンドがキーにhitしなかった回数 |
+| get_expired | GETコマンドがキーにhitしたが、期限切れだった回数 |
+| limit_maxbytes | 使用可能な最大メモリ容量（バイト） |
+| bytes | 現在使用中のメモリ容量（バイト） |
+| listen_disabled_num | コネクション数の不足によりmemcachedから切断されたコネクション数 |
+| threads | リクエスト当たりに動作するワーカースレッドの数 |
+| curr_items | 現在格納中のアイテム数 |
+| total_items | memcachedの起動から現在までに格納した累積アイテム数 |
+| evictions | メモリ容量の不足によりmemcachedから追い出されたアイテム数 |
+
+- https://tetsuyai.hatenablog.com/entry/20111221/1324441717
+
 ### New Relic
+
+環境構築方法
+
 - https://docs.newrelic.com/jp/install/python/
 - https://docs.newrelic.com/docs/infrastructure/install-infrastructure-agent/linux-installation/container-infrastructure-monitoring/

@@ -59,7 +59,7 @@ bench:
 stats:
 	cd webapp && docker stats
 
-# アクセスログを解析する
+# nginxのアクセスログを解析する
 .PHONY: analyze-nginx-log
 analyze-nginx-log:
 	docker build -t alp ./webapp/logs/nginx
@@ -69,7 +69,7 @@ analyze-nginx-log:
 			--sort=sum -r | \
 		less
 
-# スロークエリを解析する
+# mysqlのスロークエリを解析する
 .PHONY: analyze-mysql-log
 analyze-mysql-log:
 	docker pull matsuu/pt-query-digest
@@ -99,9 +99,18 @@ analyze-python-log-wlreporter:
 analyze-python-log-wlreporter-server:
 	open http://0.0.0.0/wsgi_lineprof/
 
+# memcachedを再起動する
+.PHONY: restart-memcached
+restart-memcached:
+	cd webapp && docker-compose rm -fsv memcached
+	cd webapp && docker-compose up -d memcached
+	# pythonサーバーリロードが必要です
+
 # memcachedの情報を取得
 .PHONY: analyze-memcached-stats
 analyze-memcached-stats:
+	# "docker-compose起動開始時からの累積なので注意"
+	# "正確な情報を取得するにはベンチマーク前にmake restart-memcachedを実行する"
 	( \
 		echo open localhost 11211 && \
 		sleep 1 && \
@@ -110,15 +119,15 @@ analyze-memcached-stats:
 		echo "exit" \
 	) | telnet | less
 
-# データベースの中身を確認する
-.PHONY: exec-mysql
-exec-mysql:
-	cd webapp && docker-compose exec mysql bash -c 'mysql -u root -proot isuconp'
-
 # nginxの設定を再読み込みする
 .PHONY: reload-nginx
 reload-nginx:
 	cd webapp && docker-compose exec -it nginx nginx -s reload
+
+# データベースの中身を確認する
+.PHONY: exec-mysql
+exec-mysql:
+	cd webapp && docker-compose exec mysql bash -c 'mysql -u root -proot isuconp'
 
 .PHONY: help
 help:
