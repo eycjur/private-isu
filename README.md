@@ -38,6 +38,7 @@ cd ../..
 ```sh
 make up
 # http://0.0.0.0:80 からアプリにアクセスできる
+# MySQLの初期データのロードにはかなり時間がかかります。
 ```
 
 ### ベンチマーカーの実行
@@ -46,7 +47,6 @@ make up
 
 ```sh
 make bench
-# MySQLコンテナの初期データのロードには多少時間がかかるため、コンテナ起動直後は失敗することがあります
 
 # ベンチマーカー実行中にコンテナごとの負荷を確認する
 make stats
@@ -66,6 +66,8 @@ make analyze-python-log
 # memcachedの情報を取得する
 #   ベンチマーク前にmake restart-memcachedを実行することを推奨
 make analyze-memcached-stats
+# netdataのUIを表示する
+# http://localhost:19999 からアクセス
 ```
 
 ### Dev Containerを用いたデバッグ
@@ -264,6 +266,10 @@ ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名1>,
 | evictions | メモリ容量の不足によりmemcachedから追い出されたアイテム数 |
 
 - https://tetsuyai.hatenablog.com/entry/20111221/1324441717
+
+### NetData
+
+探索中、、、
 
 ### New Relic
 
