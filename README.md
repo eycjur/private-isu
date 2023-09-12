@@ -66,8 +66,6 @@ make analyze-python-log
 # memcachedの情報を取得する
 #   ベンチマーク前にmake restart-memcachedを実行することを推奨
 make analyze-memcached-stats
-# netdataのUIを表示する
-# http://localhost:19999 からアクセス
 ```
 
 ### Dev Containerを用いたデバッグ
@@ -272,6 +270,7 @@ ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名1>,
 現状は利用しない設定になっています。利用する場合は以下の変更が必要です。
 
 1. webapp/docker-compose.ymlのnetdataのコメントアウトを外す
+2. http://localhost:19999 からnetdataのUIにアクセスして、モニタリングを行う
 
 ### New Relic
 
@@ -279,20 +278,21 @@ ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名1>,
 
 1. webapp/docker-compose.ymlのnewrelic-infraのコメントアウトを外す
 2. New Relicのアカウントを作成し、webapp/.env.pubを参考に、webapp/.envを作成する
-3. webapp/python/Dockerfileを以下のように変更し、devcontainer上での実行コマンドも`run-server-newrelic`を利用する
-```diff
--CMD gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
-+# CMD gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
- 
--# # if you want to use newrelic
--# ENV NEW_RELIC_CONFIG_FILE=newrelic.ini
--# RUN pip install newrelic
--# CMD newrelic-admin run-program gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
-+# if you want to use newrelic
-+ENV NEW_RELIC_CONFIG_FILE=newrelic.ini
-+RUN pip install newrelic
-+CMD newrelic-admin run-program gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
-```
+3. webapp/python/Dockerfileを以下のように変更する。また、devcontainer上での実行コマンドも`run-server-newrelic`を利用する
+   ```diff
+   -CMD gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
+   +# CMD gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
+   
+   -# # if you want to use newrelic
+   -# ENV NEW_RELIC_CONFIG_FILE=newrelic.ini
+   -# RUN pip install newrelic
+   -# CMD newrelic-admin run-program gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
+   +# if you want to use newrelic
+   +ENV NEW_RELIC_CONFIG_FILE=newrelic.ini
+   +RUN pip install newrelic
+   +CMD newrelic-admin run-program gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
+   ```
+4. [new relicのwebサイト](https://newrelic.com/jp)にアクセスし、モニタリングを行う
 
 なお、MySQL,nginx,memcachedなどのモニタリングは設定していません。
 
