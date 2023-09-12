@@ -111,13 +111,9 @@ restart-memcached:
 analyze-memcached-stats:
 	# "docker-compose起動開始時からの累積なので注意"
 	# "正確な情報を取得するにはベンチマーク前にmake restart-memcachedを実行する"
-	( \
-		echo open localhost 11211 && \
-		sleep 1 && \
-		echo stats && \
-		sleep 1 && \
-		echo "exit" \
-	) | telnet | less
+	echo 'stats\nquit' | \
+		curl -s -T - telnet://0.0.0.0:11211 | \
+		less
 
 # nginxの設定を再読み込みする
 .PHONY: reload-nginx
