@@ -1,2 +1,2 @@
-license_key: <license_key>
+# license_key: <環境変数で設定>
 enable_process_metrics: true

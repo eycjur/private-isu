@@ -1,3 +1,4 @@
 FROM newrelic/infrastructure
 
-ADD newrelic-infra.yml /etc/newrelic-infra.yml
+COPY newrelic-infra.yml /etc/newrelic-infra.yml
+COPY newrelic-infra/ /etc/newrelic-infra/

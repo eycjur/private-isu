@@ -269,11 +269,34 @@ ALTER TABLE <テーブル名> ADD INDEX <インデックス名>(<カラム名1>,
 
 ### NetData
 
-探索中、、、
+現状は利用しない設定になっています。利用する場合は以下の変更が必要です。
+
+1. webapp/docker-compose.ymlのnetdataのコメントアウトを外す
 
 ### New Relic
 
-環境構築方法
+現状は利用しない設定になっています。利用する場合は以下の変更が必要です。
+
+1. webapp/docker-compose.ymlのnewrelic-infraのコメントアウトを外す
+2. New Relicのアカウントを作成し、webapp/.env.pubを参考に、webapp/.envを作成する
+3. webapp/python/Dockerfileを以下のように変更し、devcontainer上での実行コマンドも`run-server-newrelic`を利用する
+```diff
+-CMD gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
++# CMD gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
+ 
+-# # if you want to use newrelic
+-# ENV NEW_RELIC_CONFIG_FILE=newrelic.ini
+-# RUN pip install newrelic
+-# CMD newrelic-admin run-program gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
++# if you want to use newrelic
++ENV NEW_RELIC_CONFIG_FILE=newrelic.ini
++RUN pip install newrelic
++CMD newrelic-admin run-program gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
+```
+
+なお、MySQL,nginx,memcachedなどのモニタリングは設定していません。
+
+cf. 環境構築方法
 
 - https://docs.newrelic.com/jp/install/python/
 - https://docs.newrelic.com/docs/infrastructure/install-infrastructure-agent/linux-installation/container-infrastructure-monitoring/
