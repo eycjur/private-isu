@@ -7,8 +7,24 @@
 ## ディレクトリ構成
 
 ```
-├── benchmarker  # ベンチマーカーのソースコード
-└── webapp       # 各言語の参考実装
+├── benchmarker         # ベンチマーカーのソースコード
+├── img                 # README.mdに貼り付ける画像
+└── webapp              # 各言語の参考実装
+    ├── etc             # nginx, mysqlの設定ファイル
+    ├── golang
+    ├── logs            # ログ解析用のDockerfile,ログファイル
+    │   ├── mysql
+    │   ├── netdata
+    │   ├── newrelic
+    │   ├── nginx
+    │   └── python
+    ├── node
+    ├── php
+    ├── public          # 静的ファイル
+    ├── python          # Pythonの参考実装
+    │   └── templates   # Jinja2のテンプレート
+    ├── ruby
+    └── sql             # MySQLの初期データ
 ```
 
 * [manual.md](/manual.md)は当日マニュアル。一部社内イベントを意識した記述があるので注意すること。
