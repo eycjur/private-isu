@@ -143,10 +143,7 @@ def make_posts(results, all_comments=False):
             post["comments"] = comments_cache
         else:
             query = """
-                SELECT comments.id, comments.user_id, comments.comment, comments.created_at, 
-                    JSON_OBJECT(
-                        'account_name', users.account_name
-                    ) AS user
+                SELECT comments.id, comments.user_id, comments.comment, comments.created_at, users.account_name
                 FROM `comments`
                 LEFT JOIN users ON comments.user_id = users.id
                 WHERE comments.post_id = %s 
