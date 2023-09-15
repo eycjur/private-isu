@@ -172,8 +172,6 @@ def make_posts(results, all_comments=False):
 
         posts.append(post)
 
-        if len(posts) >= POSTS_PER_PAGE:
-            break
     return posts
 
 
