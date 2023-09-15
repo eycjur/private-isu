@@ -1,6 +1,6 @@
 <div class="isu-post" id="pid_{{ post.id }}" data-created-at="{{ post.created_at }}">
   <div class="isu-post-header">
-    <a href="/@{{ post.user.account_name | urlencode }}" class="isu-post-account-name">{{ post.user.account_name }}</a>
+    <a href="/@{{ post.account_name | urlencode }}" class="isu-post-account-name">{{ post.account_name }}</a>
     <a href="/posts/{{ post['id'] }}" class="isu-post-permalink">
       <time class="timeago" datetime="{{ post['created_at'] }}"></time>
     </a>
@@ -9,7 +9,7 @@
     <img src="{{ image_url(post) }}" class="isu-image">
   </div>
   <div class="isu-post-text">
-    <a href="/@{{ post['user']['account_name'] | urlencode }}" class="isu-post-account-name">{{ post.user.account_name }}</a>
+    <a href="/@{{ post['account_name'] | urlencode }}" class="isu-post-account-name">{{ post.account_name }}</a>
     {{ post.body | nl2br }}
   </div>
   <div class="isu-post-comment">
@@ -19,7 +19,7 @@
 
     {% for comment in post['comments'] %}
     <div class="isu-comment">
-      <a href="/@{{ comment['user']['account_name'] | urlencode }}" class="isu-comment-account-name">{{ comment['user']['account_name'] }}</a>
+      <a href="/@{{ comment['account_name'] | urlencode }}" class="isu-comment-account-name">{{ comment['user']['account_name'] }}</a>
       <span class="isu-comment-text">{{ comment['comment'] }}</span>
     </div>
     {% endfor %}

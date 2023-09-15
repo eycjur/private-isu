@@ -288,10 +288,7 @@ def get_index():
     cursor = db().cursor()
     cursor.execute(
         """
-        SELECT posts.id, posts.user_id, posts.body, posts.mime,
-            JSON_OBJECT(
-                'account_name', users.account_name
-            ) AS user
+        SELECT posts.id, posts.user_id, posts.body, posts.mime, users.account_name
         FROM `posts`
         LEFT JOIN users ON posts.user_id = users.id
         WHERE users.del_flg = 0
@@ -319,10 +316,7 @@ def get_user_list(account_name):
 
     cursor.execute(
         """
-        SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at,
-            JSON_OBJECT(
-                'account_name', users.account_name
-            ) AS user
+        SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name
         FROM `posts`
         LEFT JOIN users ON posts.user_id = users.id
         WHERE users.del_flg = 0 AND posts.user_id = %s
@@ -380,10 +374,7 @@ def get_posts():
         max_created_at = _parse_iso8601(max_created_at)
         cursor.execute(
             """
-            SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at,
-                JSON_OBJECT(
-                    'account_name', users.account_name
-                ) AS user
+            SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name
             FROM `posts`
             LEFT JOIN users ON posts.user_id = users.id
             WHERE users.del_flg = 0
@@ -396,10 +387,7 @@ def get_posts():
     else:
         cursor.execute(
             """
-            SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at,
-                JSON_OBJECT(
-                    'account_name', users.account_name
-                ) AS user
+            SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name
             FROM `posts`
             LEFT JOIN users ON posts.user_id = users.id
             WHERE users.del_flg = 0
@@ -419,10 +407,7 @@ def get_posts_id(id):
 
     cursor.execute(
         """
-        SELECT posts.*, 
-            JSON_OBJECT(
-                'account_name', users.account_name
-            ) AS user
+        SELECT posts.*, users.account_name
         FROM `posts`
         LEFT JOIN users ON posts.user_id = users.id
         WHERE users.del_flg = 0
