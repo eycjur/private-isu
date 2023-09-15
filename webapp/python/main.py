@@ -417,7 +417,19 @@ def get_posts():
 def get_posts_id(id):
     cursor = db().cursor()
 
-    cursor.execute("SELECT * FROM `posts` WHERE `id` = %s", (id,))
+    cursor.execute(
+        # "SELECT * FROM `posts` WHERE `id` = %s",
+        """
+        SELECT posts.*
+        FROM `posts`
+        LEFT JOIN users ON posts.user_id = users.id
+        WHERE users.del_flg = 0
+            AND posts.id = %s
+        LIMIT %s
+        """,
+        (id, POSTS_PER_PAGE),
+    )
+
     posts = make_posts(cursor.fetchall(), all_comments=True)
     if not posts:
         flask.abort(404)
