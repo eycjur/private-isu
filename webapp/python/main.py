@@ -327,9 +327,17 @@ def get_user_list(account_name):
         flask.abort(404)  # raises exception
 
     cursor.execute(
-        "SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` WHERE `user_id` = %s ORDER BY `created_at` DESC",
-        (user["id"],),
+        """
+        SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at
+        FROM `posts`
+        LEFT JOIN users ON posts.user_id = users.id
+        WHERE users.del_flg = 0 AND posts.user_id = %s
+        ORDER BY posts.created_at DESC
+        LIMIT %s
+        """,
+        (user["id"], POSTS_PER_PAGE),
     )
+
     posts = make_posts(cursor.fetchall())
 
     cursor.execute(
