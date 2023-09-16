@@ -81,6 +81,7 @@ analyze-nginx-log:
 		docker run --rm -i alp alp json \
 			-o count,method,uri,min,avg,max,sum \
 			--limit 100000 \
+			--matching-groups='/@[A-z]+,/posts/[0-9]+,/image/[0-9]+' \
 			--sort=sum -r | \
 		less
 
@@ -89,7 +90,8 @@ analyze-nginx-log:
 analyze-mysql-log:
 	docker pull matsuu/pt-query-digest
 	cat $(LOG_FILE_MYSQL) | \
-		docker run --rm -i matsuu/pt-query-digest --limit 10 | \
+		docker run --rm -i matsuu/pt-query-digest \
+			--group-by fingerprint | \
 		less
 
 # pythonのprofileを解析する
