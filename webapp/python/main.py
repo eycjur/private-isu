@@ -156,7 +156,7 @@ def make_posts(results, all_comments=False):
         query = """
             SELECT comments.id, comments.user_id, comments.comment, comments.created_at, users.account_name
             FROM `comments`
-            LEFT JOIN users ON comments.user_id = users.id
+            JOIN users ON comments.user_id = users.id
             WHERE comments.post_id = %s 
             ORDER BY comments.created_at DESC
             """
@@ -295,7 +295,7 @@ def get_index():
         SELECT posts.id, posts.user_id, posts.body, posts.mime, users.account_name
         FROM `posts`
         FORCE INDEX (idx_created_at)
-        LEFT JOIN users ON posts.user_id = users.id
+        JOIN users ON posts.user_id = users.id
         WHERE users.del_flg = 0
         ORDER BY posts.created_at DESC
         LIMIT %s
@@ -323,7 +323,7 @@ def get_user_list(account_name):
         """
         SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name
         FROM `posts`
-        LEFT JOIN users ON posts.user_id = users.id
+        JOIN users ON posts.user_id = users.id
         WHERE users.del_flg = 0 AND posts.user_id = %s
         ORDER BY posts.created_at DESC
         LIMIT %s
@@ -382,7 +382,7 @@ def get_posts():
             SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name
             FROM `posts`
             FORCE INDEX (idx_created_at)
-            LEFT JOIN users ON posts.user_id = users.id
+            JOIN users ON posts.user_id = users.id
             WHERE users.del_flg = 0
                 and posts.created_at <= %s
             ORDER BY posts.created_at DESC
@@ -395,7 +395,7 @@ def get_posts():
             """
             SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name
             FROM `posts`
-            LEFT JOIN users ON posts.user_id = users.id
+            JOIN users ON posts.user_id = users.id
             WHERE users.del_flg = 0
             ORDER BY posts.created_at DESC
             LIMIT %s
@@ -415,7 +415,7 @@ def get_posts_id(id):
         """
         SELECT posts.*, users.account_name
         FROM `posts`
-        LEFT JOIN users ON posts.user_id = users.id
+        JOIN users ON posts.user_id = users.id
         WHERE users.del_flg = 0
             AND posts.id = %s
         LIMIT %s
