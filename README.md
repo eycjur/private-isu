@@ -47,6 +47,9 @@ curl -L -O https://github.com/catatsuy/private-isu/releases/download/img/img.zip
 unzip img.zip
 rm img.zip
 cd ../..
+
+# 環境変数をセットする。new relicを利用する場合は webapp/.env.pubを参考に
+touch webapp/.env
 ```
 
 ### アプリの起動
