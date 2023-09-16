@@ -137,12 +137,14 @@ def make_posts(results, all_comments=False):
     posts = []
     cursor = db().cursor()
 
+    memcahce_client = memcache()
+    keys = [f"comment_count_by_{post['id']}" for post in results]
+    comment_counts = memcahce_client.get_multi(keys)
+
     for post in results:
-        memcahce_client = memcache()
         key = f"comment_count_by_{post['id']}"
-        comment_count = memcahce_client.get(key, None)
-        if comment_count is not None:
-            post["comment_count"] = comment_count
+        if key in comment_counts:
+            post["comment_count"] = comment_counts[key]
         else:
             cursor.execute(
                 "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = %s",
