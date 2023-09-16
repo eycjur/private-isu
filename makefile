@@ -66,6 +66,7 @@ analyze-nginx-log:
 	cat $(LOG_FILE_NGINX) | \
 		docker run --rm -i alp alp json \
 			-o count,method,uri,min,avg,max,sum \
+			--limit 100000 \
 			--sort=sum -r | \
 		less
 
