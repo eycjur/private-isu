@@ -13,7 +13,7 @@ services:
       resources:
         limits:
           cpus: '2'
-          memory: 1g
+          memory: 4g
 
   app:
     # Go実装の場合は golang/ PHP実装の場合は php/
@@ -42,7 +42,7 @@ services:
       resources:
         limits:
           cpus: '2'
-          memory: 1g
+          memory: 4g
     depends_on:
       mysql:
         condition: service_healthy
@@ -64,7 +64,7 @@ services:
       resources:
         limits:
           cpus: '2'
-          memory: 1g
+          memory: 4g
     healthcheck:
       test: ["CMD-SHELL", "curl http://localhost:3306 > /dev/null"]
       interval: 10s
@@ -80,7 +80,7 @@ services:
       resources:
         limits:
           cpus: '2'
-          memory: 1g
+          memory: 4g
 
   # newrelic-infra:
   #   build: logs/newrelic/
