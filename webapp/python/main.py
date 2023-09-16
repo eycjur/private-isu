@@ -138,6 +138,12 @@ def make_posts(results, all_comments=False):
     cursor = db().cursor()
 
     for post in results:
+        cursor.execute(
+            "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = %s",
+            (post["id"],),
+        )
+        post["comment_count"] = cursor.fetchone()["count"]
+
         query = """
             SELECT comments.id, comments.user_id, comments.comment, comments.created_at, users.account_name
             FROM `comments`
@@ -277,19 +283,15 @@ def get_index():
     cursor = db().cursor()
     cursor.execute(
         """
-        SELECT posts.id, posts.user_id, posts.body, posts.mime, users.account_name, comment_counts.comment_count
+        SELECT posts.id, posts.user_id, posts.body, posts.mime, users.account_name
         FROM `posts`
         LEFT JOIN users ON posts.user_id = users.id
-        LEFT JOIN (
-            SELECT post_id, COUNT(*) AS comment_count FROM comments GROUP BY post_id
-        ) AS comment_counts ON posts.id = comment_counts.post_id
         WHERE users.del_flg = 0
         ORDER BY posts.created_at DESC
         LIMIT %s
         """,
         (POSTS_PER_PAGE,),
     )
-
     posts = make_posts(cursor.fetchall())
 
     return flask.render_template("index.html", posts=posts, me=me)
@@ -309,12 +311,9 @@ def get_user_list(account_name):
 
     cursor.execute(
         """
-        SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name, comment_counts.comment_count
+        SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name
         FROM `posts`
         LEFT JOIN users ON posts.user_id = users.id
-        LEFT JOIN (
-            SELECT post_id, COUNT(*) AS comment_count FROM comments GROUP BY post_id
-        ) AS comment_counts ON posts.id = comment_counts.post_id
         WHERE users.del_flg = 0 AND posts.user_id = %s
         ORDER BY posts.created_at DESC
         LIMIT %s
@@ -370,12 +369,9 @@ def get_posts():
         max_created_at = _parse_iso8601(max_created_at)
         cursor.execute(
             """
-            SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name, comment_counts.comment_count
+            SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name
             FROM `posts`
             LEFT JOIN users ON posts.user_id = users.id
-            LEFT JOIN (
-                SELECT post_id, COUNT(*) AS comment_count FROM comments GROUP BY post_id
-            ) AS comment_counts ON posts.id = comment_counts.post_id
             WHERE users.del_flg = 0
                 and posts.created_at <= %s
             ORDER BY posts.created_at DESC
@@ -386,19 +382,15 @@ def get_posts():
     else:
         cursor.execute(
             """
-            SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name, comment_counts.comment_count
+            SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name
             FROM `posts`
             LEFT JOIN users ON posts.user_id = users.id
-            LEFT JOIN (
-                SELECT post_id, COUNT(*) AS comment_count FROM comments GROUP BY post_id
-            ) AS comment_counts ON posts.id = comment_counts.post_id
             WHERE users.del_flg = 0
             ORDER BY posts.created_at DESC
             LIMIT %s
             """,
             (POSTS_PER_PAGE,),
         )
-
     results = cursor.fetchall()
     posts = make_posts(results)
     return flask.render_template("posts.html", posts=posts)
@@ -410,12 +402,9 @@ def get_posts_id(id):
 
     cursor.execute(
         """
-        SELECT posts.*, users.account_name, comment_counts.comment_count
+        SELECT posts.*, users.account_name
         FROM `posts`
         LEFT JOIN users ON posts.user_id = users.id
-        LEFT JOIN (
-            SELECT post_id, COUNT(*) AS comment_count FROM comments GROUP BY post_id
-        ) AS comment_counts ON posts.id = comment_counts.post_id
         WHERE users.del_flg = 0
             AND posts.id = %s
         LIMIT %s
