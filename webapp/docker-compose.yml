@@ -13,7 +13,7 @@ services:
       resources:
         limits:
           cpus: '2'
-          memory: 1g
+          memory: 4g
 
   app:
     # Go実装の場合は golang/ PHP実装の場合は php/
@@ -41,7 +41,7 @@ services:
       resources:
         limits:
           cpus: '2'
-          memory: 1g
+          memory: 4g
     depends_on:
       mysql:
         condition: service_healthy
@@ -56,14 +56,15 @@ services:
       - mysql:/var/lib/mysql
       - ./etc/my.cnf:/etc/my.cnf
       - ./sql:/docker-entrypoint-initdb.d
-      - ./logs/mysql/mysql-slow.log:/var/log/mysql/mysql-slow.log
+      - ./logs/mysql:/var/log/mysql
     ports:
       - "3306:3306"
+    user: mysql
     deploy:
       resources:
         limits:
           cpus: '2'
-          memory: 1g
+          memory: 4g
     healthcheck:
       test: ["CMD-SHELL", "curl http://localhost:3306 > /dev/null"]
       interval: 10s
@@ -79,7 +80,7 @@ services:
       resources:
         limits:
           cpus: '2'
-          memory: 1g
+          memory: 4g
 
   # newrelic-infra:
   #   build: logs/newrelic/
@@ -110,9 +111,7 @@ services:
   #     - /sys:/host/sys:ro
   #     - /etc/os-release:/host/etc/os-release:ro
   #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #     - ./logs/netdata/netdata.conf:/etc/netdata/netdata.conf
-  #     - ./logs/netdata/python.d:/etc/netdata/python.d
-  #     - ./logs/netdata/go.d:/etc/netdata/go.d
+  #     - ./logs/netdata:/etc/netdata
   #   ports:
   #     - 19999:19999
   #   # mysqlコンテナはhealth checkが通っていてもアクセスできるようになるまで時間かかるのでその対策
