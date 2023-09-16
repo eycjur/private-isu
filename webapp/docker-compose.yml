@@ -4,7 +4,7 @@ services:
     volumes:
       - ./etc/nginx/conf.d:/etc/nginx/conf.d
       - ./public:/public
-      - ./logs/nginx/access.log:/var/log/nginx/access.log
+      - ./logs/nginx:/var/log/nginx
     ports:
       - "80:80"
     links:
@@ -33,8 +33,7 @@ services:
     volumes:
       - ./public:/home/public
       - ./python:/home/webapp
-      - ./logs/python/profile.log:/var/log/python/profile.log
-      - ./logs/python/profile_wlreporter.log:/var/log/python/profile_wlreporter.log
+      - ./logs/python:/var/log/python
     ports:
       - "8080:8080"
     init: true
@@ -57,7 +56,7 @@ services:
       - mysql:/var/lib/mysql
       - ./etc/my.cnf:/etc/my.cnf
       - ./sql:/docker-entrypoint-initdb.d
-      - ./logs/mysql/mysql-slow.log:/var/log/mysql/mysql-slow.log
+      - ./logs/mysql:/var/log/mysql
     ports:
       - "3306:3306"
     deploy:
@@ -111,9 +110,7 @@ services:
   #     - /sys:/host/sys:ro
   #     - /etc/os-release:/host/etc/os-release:ro
   #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #     - ./logs/netdata/netdata.conf:/etc/netdata/netdata.conf
-  #     - ./logs/netdata/python.d:/etc/netdata/python.d
-  #     - ./logs/netdata/go.d:/etc/netdata/go.d
+  #     - ./logs/netdata:/etc/netdata
   #   ports:
   #     - 19999:19999
   #   # mysqlコンテナはhealth checkが通っていてもアクセスできるようになるまで時間かかるのでその対策
