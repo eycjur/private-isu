@@ -47,6 +47,9 @@ curl -L -O https://github.com/catatsuy/private-isu/releases/download/img/img.zip
 unzip img.zip
 rm img.zip
 cd ../..
+
+# .envファイルの作成（中身はnew relicでしか使わないので変更不要）
+cp webapp/.env.pub webapp/.env
 ```
 
 ### アプリの起動
