@@ -5,6 +5,7 @@ import re
 import subprocess
 import tempfile
 
+import cachetools
 import flask
 import jinja2
 import MySQLdb.cursors
@@ -18,8 +19,10 @@ import pymc_session
 
 UPLOAD_LIMIT = 10 * 1024 * 1024  # 10mb
 POSTS_PER_PAGE = 20
+CACHE_TTL = 10
 
 
+cache = cachetools.TTLCache(maxsize=100, ttl=60)
 _config = None
 
 
@@ -133,6 +136,25 @@ def get_session_user():
     return None
 
 
+@cachetools.cached(cache)
+def get_post_comments(post_id, all_comments=False):
+    cursor = db().cursor()
+    query = """
+        SELECT comments.id, comments.user_id, comments.comment, comments.created_at, users.account_name
+        FROM `comments`
+        JOIN users ON comments.user_id = users.id
+        WHERE comments.post_id = %s 
+        ORDER BY comments.created_at DESC
+        """
+    if not all_comments:
+        query += " LIMIT 3"
+
+    cursor.execute(query, (post_id,))
+    comments = list(cursor)
+    comments.reverse()
+    return comments
+
+
 def make_posts(results, all_comments=False):
     posts = []
     cursor = db().cursor()
@@ -153,19 +175,7 @@ def make_posts(results, all_comments=False):
             post["comment_count"] = cursor.fetchone()["count"]
             memcahce_client.set(key, post["comment_count"])
 
-        query = """
-            SELECT comments.id, comments.user_id, comments.comment, comments.created_at, users.account_name
-            FROM `comments`
-            JOIN users ON comments.user_id = users.id
-            WHERE comments.post_id = %s 
-            ORDER BY comments.created_at DESC
-            """
-        if not all_comments:
-            query += " LIMIT 3"
-
-        cursor.execute(query, (post["id"],))
-        comments = list(cursor)
-        comments.reverse()
+        comments = get_post_comments(post["id"], all_comments=all_comments)
         post["comments"] = comments
 
         posts.append(post)
