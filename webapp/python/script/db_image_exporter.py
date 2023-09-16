@@ -11,7 +11,7 @@ db_password = os.environ.get("ISUCONP_DB_PASSWORD", None)
 db_name = os.environ.get("ISUCONP_DB_NAME", "isuconp")
 
 # 画像を保存するディレクトリのパス
-image_dir = "image"
+image_dir = "/home/public/image"
 os.makedirs(image_dir, exist_ok=True)
 
 

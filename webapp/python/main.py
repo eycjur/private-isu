@@ -67,6 +67,13 @@ def db_initialize():
         cur.execute(q)
 
 
+def img_initialize():
+    img_dir = pathlib.Path("/home/public/image")
+    for img in img_dir.glob("*"):
+        if int(img.stem) > 10000:
+            img.unlink()
+
+
 _mcclient = None
 
 
@@ -204,6 +211,7 @@ def nl2br(eval_ctx, value):
 @app.route("/initialize")
 def get_initialize():
     db_initialize()
+    img_initialize()
     return ""
 
 
@@ -444,12 +452,7 @@ def post_index():
     elif mime == "image/gif":
         img_ext = ".gif"
 
-    # idはidカラムの最大値
-    query = f"SELECT MAX(`id`) as max_id FROM `posts`"
-    cursor = db().cursor()
-    cursor.execute(query)
-    max_id_value = cursor.fetchone()["max_id"]
-    file.save(f"/home/public/image/{max_id_value}{img_ext}")
+    file.save(f"/home/public/image/{pid}{img_ext}")
 
     return flask.redirect("/posts/%d" % pid)
 
