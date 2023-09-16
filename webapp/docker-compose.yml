@@ -59,6 +59,7 @@ services:
       - ./logs/mysql:/var/log/mysql
     ports:
       - "3306:3306"
+    user: mysql
     deploy:
       resources:
         limits:
