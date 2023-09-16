@@ -1,5 +1,4 @@
 import datetime
-import json
 import os
 import pathlib
 import re
@@ -131,9 +130,6 @@ def make_posts(results, all_comments=False):
     posts = []
     cursor = db().cursor()
 
-    keys = [f'post_comments_{post["id"]}_{all_comments}' for post in results]
-    comments_cache = memcache().get_multi(keys)
-
     for post in results:
         cursor.execute(
             "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = %s",
@@ -141,27 +137,20 @@ def make_posts(results, all_comments=False):
         )
         post["comment_count"] = cursor.fetchone()["count"]
 
-        key = f'post_comments_{post["id"]}_{all_comments}'
-        if key in comments_cache:
-            post["comments"] = comments_cache[key]
-        else:
-            query = """
-                SELECT comments.id, comments.user_id, comments.comment, comments.created_at, users.account_name
-                FROM `comments`
-                LEFT JOIN users ON comments.user_id = users.id
-                WHERE comments.post_id = %s 
-                ORDER BY comments.created_at DESC
-                """
-            if not all_comments:
-                query += " LIMIT 3"
+        query = """
+            SELECT comments.id, comments.user_id, comments.comment, comments.created_at, users.account_name
+            FROM `comments`
+            LEFT JOIN users ON comments.user_id = users.id
+            WHERE comments.post_id = %s 
+            ORDER BY comments.created_at DESC
+            """
+        if not all_comments:
+            query += " LIMIT 3"
 
-            cursor.execute(query, (post["id"],))
-            comments = list(cursor)
-            comments.reverse()
-            post["comments"] = comments
-            memcache().set(
-                f'post_comments_{post["id"]}_{all_comments}', comments, expire=30
-            )
+        cursor.execute(query, (post["id"],))
+        comments = list(cursor)
+        comments.reverse()
+        post["comments"] = comments
 
         posts.append(post)
 
