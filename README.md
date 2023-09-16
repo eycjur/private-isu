@@ -36,6 +36,7 @@
 
 ```sh
 git clone https://github.com/eycjur/private-isu.git
+cd private-isu
 
 # MySQLの初期データのダウンロード
 cd webapp/sql
@@ -47,7 +48,7 @@ cd ../..
 cd benchmarker/userdata
 curl -L -O https://github.com/catatsuy/private-isu/releases/download/img/img.zip
 unzip img.zip
-rm img.zip
+rm -f img.zip
 cd ../..
 
 # .envファイルの作成（中身はnew relicでしか使わないので変更不要）
