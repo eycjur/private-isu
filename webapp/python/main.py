@@ -131,6 +131,9 @@ def make_posts(results, all_comments=False):
     posts = []
     cursor = db().cursor()
 
+    keys = [f'post_comments_{post["id"]}_{all_comments}' for post in results]
+    comments_cache = memcache().get_multi(keys)
+
     for post in results:
         cursor.execute(
             "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = %s",
@@ -138,9 +141,9 @@ def make_posts(results, all_comments=False):
         )
         post["comment_count"] = cursor.fetchone()["count"]
 
-        comments_cache = memcache().get("post_comments_%d" % post["id"], None)
-        if comments_cache is not None:
-            post["comments"] = comments_cache
+        key = f'post_comments_{post["id"]}_{all_comments}'
+        if key in comments_cache:
+            post["comments"] = comments_cache[key]
         else:
             query = """
                 SELECT comments.id, comments.user_id, comments.comment, comments.created_at, users.account_name
@@ -157,9 +160,7 @@ def make_posts(results, all_comments=False):
             comments.reverse()
             post["comments"] = comments
             memcache().set(
-                f'post_comments_{post["id"]}_{all_comments}',
-                comments,
-                expire=10,
+                f'post_comments_{post["id"]}_{all_comments}', comments, expire=30
             )
 
         posts.append(post)
