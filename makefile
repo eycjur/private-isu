@@ -53,6 +53,20 @@ bench:
 			-t http://host.docker.internal \
 			-u /opt/go/userdata
 
+# mysqlを再起動する
+.PHONY: restart-mysql
+restart-mysql:
+	cd webapp && docker-compose rm -fsv mysql
+	cd webapp && docker-compose up -d mysql
+	# pythonサーバーのリロードが必要です
+
+# memcachedを再起動する
+.PHONY: restart-memcached
+restart-memcached:
+	cd webapp && docker-compose rm -fsv memcached
+	cd webapp && docker-compose up -d memcached
+	# pythonサーバーのリロードが必要です
+
 ## ログ解析関係
 # CPUやメモリの使用状況を確認する
 .PHONY: stats
@@ -99,13 +113,6 @@ analyze-python-log-wlreporter:
 .PHONY: analyze-python-log-wlreporter-server
 analyze-python-log-wlreporter-server:
 	open http://0.0.0.0/wsgi_lineprof/
-
-# memcachedを再起動する
-.PHONY: restart-memcached
-restart-memcached:
-	cd webapp && docker-compose rm -fsv memcached
-	cd webapp && docker-compose up -d memcached
-	# pythonサーバーリロードが必要です
 
 # memcachedの情報を取得
 .PHONY: analyze-memcached-stats
