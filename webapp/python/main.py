@@ -294,6 +294,7 @@ def get_index():
         """
         SELECT posts.id, posts.user_id, posts.body, posts.mime, users.account_name
         FROM `posts`
+        FORCE INDEX (idx_created_at)
         LEFT JOIN users ON posts.user_id = users.id
         WHERE users.del_flg = 0
         ORDER BY posts.created_at DESC
@@ -380,6 +381,7 @@ def get_posts():
             """
             SELECT posts.id, posts.user_id, posts.body, posts.mime, posts.created_at, users.account_name
             FROM `posts`
+            FORCE INDEX (idx_created_at)
             LEFT JOIN users ON posts.user_id = users.id
             WHERE users.del_flg = 0
                 and posts.created_at <= %s
