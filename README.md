@@ -35,6 +35,8 @@
 ### 事前準備
 
 ```sh
+git clone https://github.com/eycjur/private-isu.git
+
 # MySQLの初期データのダウンロード
 cd webapp/sql
 curl -L -O https://github.com/catatsuy/private-isu/releases/download/img/dump.sql.bz2
