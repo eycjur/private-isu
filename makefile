@@ -53,6 +53,20 @@ bench:
 			-t http://host.docker.internal \
 			-u /opt/go/userdata
 
+# mysqlを再起動する
+.PHONY: restart-mysql
+restart-mysql:
+	cd webapp && docker-compose rm -fsv mysql
+	cd webapp && docker-compose up -d mysql
+	# pythonサーバーのリロードが必要です
+
+# memcachedを再起動する
+.PHONY: restart-memcached
+restart-memcached:
+	cd webapp && docker-compose rm -fsv memcached
+	cd webapp && docker-compose up -d memcached
+	# pythonサーバーのリロードが必要です
+
 ## ログ解析関係
 # CPUやメモリの使用状況を確認する
 .PHONY: stats
@@ -66,6 +80,8 @@ analyze-nginx-log:
 	cat $(LOG_FILE_NGINX) | \
 		docker run --rm -i alp alp json \
 			-o count,method,uri,min,avg,max,sum \
+			--limit 100000 \
+			--matching-groups='/@[A-z]+,/posts/[0-9]+,/image/[0-9]+' \
 			--sort=sum -r | \
 		less
 
@@ -74,7 +90,8 @@ analyze-nginx-log:
 analyze-mysql-log:
 	docker pull matsuu/pt-query-digest
 	cat $(LOG_FILE_MYSQL) | \
-		docker run --rm -i matsuu/pt-query-digest --limit 10 | \
+		docker run --rm -i matsuu/pt-query-digest \
+			--group-by fingerprint | \
 		less
 
 # pythonのprofileを解析する
@@ -98,13 +115,6 @@ analyze-python-log-wlreporter:
 .PHONY: analyze-python-log-wlreporter-server
 analyze-python-log-wlreporter-server:
 	open http://0.0.0.0/wsgi_lineprof/
-
-# memcachedを再起動する
-.PHONY: restart-memcached
-restart-memcached:
-	cd webapp && docker-compose rm -fsv memcached
-	cd webapp && docker-compose up -d memcached
-	# pythonサーバーリロードが必要です
 
 # memcachedの情報を取得
 .PHONY: analyze-memcached-stats

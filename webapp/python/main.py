@@ -5,6 +5,7 @@ import re
 import subprocess
 import tempfile
 
+import cachetools
 import flask
 import jinja2
 import MySQLdb.cursors
@@ -18,8 +19,10 @@ import pymc_session
 
 UPLOAD_LIMIT = 10 * 1024 * 1024  # 10mb
 POSTS_PER_PAGE = 20
+CACHE_TTL = 10
 
 
+cache = cachetools.TTLCache(maxsize=100, ttl=60)
 _config = None
 
 
