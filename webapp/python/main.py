@@ -144,12 +144,7 @@ def make_posts(results, all_comments=False):
             """
             SELECT comments.*, 
                 JSON_OBJECT(
-                    'id', users.id,
-                    'account_name', users.account_name,
-                    'passhash', users.passhash,
-                    'authority', users.authority,
-                    'del_flg', users.del_flg,
-                    'created_at', users.created_at
+                    'account_name', users.account_name
                 ) AS user
             FROM comments
             JOIN users on users.id = comments.user_id
