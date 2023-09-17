@@ -132,12 +132,21 @@ def get_session_user():
 def make_posts(results, all_comments=False):
     posts = []
     cursor = db().cursor()
+    memcache_client = memcache()
+
     for post in results:
-        cursor.execute(
-            "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = %s",
-            (post["id"],),
-        )
-        post["comment_count"] = cursor.fetchone()["count"]
+        key = f"comment_count_by_{post['id']}"
+        comment_count = memcache_client.get(key, None)
+        if comment_count is not None:
+            post["comment_count"] = comment_count
+        else:
+            cursor.execute(
+                "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = %s",
+                (post["id"],),
+            )
+            comment_count2 = cursor.fetchone()["count"]
+            post["comment_count"] = comment_count2
+            memcache_client.set(key, comment_count2)
 
         query = (
             # "SELECT * FROM `comments` WHERE `post_id` = %s ORDER BY `created_at` DESC"
