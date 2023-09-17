@@ -13,7 +13,7 @@ WORKDIR /home/webapp
 COPY . /home/webapp
 RUN pip install -r requirements.freeze
 
-CMD gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile -
+CMD gunicorn main:app -b "0.0.0.0:8080" --reload --log-file - --access-logfile - -w 10
 
 # # if you want to use newrelic
 # ENV NEW_RELIC_CONFIG_FILE=newrelic.ini
