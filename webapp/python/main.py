@@ -283,8 +283,17 @@ def get_index():
 
     cursor = db().cursor()
     cursor.execute(
-        "SELECT `id`, `user_id`, `body`, `created_at`, `mime` FROM `posts` ORDER BY `created_at` DESC"
+        """
+        SELECT posts.id, posts.user_id, posts.body, posts.created_at, posts.mime
+        FROM posts
+        JOIN users on users.id = posts.user_id
+        WHERE users.del_flg = 0
+        ORDER BY posts.created_at DESC
+        LIMIT %s
+        """,
+        (POSTS_PER_PAGE,),
     )
+
     posts = make_posts(cursor.fetchall())
 
     return flask.render_template("index.html", posts=posts, me=me)
