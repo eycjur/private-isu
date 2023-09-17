@@ -34,6 +34,8 @@
 
 ### 事前準備
 
+※bunzip2,unzipなど必要なコマンドがない場合は失敗することがあります。その場合は適宜インストールしてください。
+
 ```sh
 git clone https://github.com/eycjur/private-isu.git
 cd private-isu
@@ -61,6 +63,10 @@ cp webapp/.env.pub webapp/.env
 make up
 # http://0.0.0.0:80 からアプリにアクセスできる
 # MySQLの初期データのロードにはかなり時間がかかります。
+
+# テーブルがないなどのエラーが出る場合は、一度まっさらな状態に戻してから再度実行する
+make down-all
+make up
 ```
 
 ### ベンチマーカーの実行
@@ -84,6 +90,7 @@ make analyze-nginx-log
 # mysqlのスロークエリを解析する
 make analyze-mysql-log
 # pythonのprofilerを解析する
+#   表示されるリンクをブラウザで開いてください(wslの場合はwslのipアドレス`hostname -I`に置き換えてください)
 make analyze-python-log
 # memcachedの情報を取得する
 #   ベンチマーク前にmake restart-memcachedを実行することを推奨
