@@ -140,18 +140,33 @@ def make_posts(results, all_comments=False):
         post["comment_count"] = cursor.fetchone()["count"]
 
         query = (
-            "SELECT * FROM `comments` WHERE `post_id` = %s ORDER BY `created_at` DESC"
+            # "SELECT * FROM `comments` WHERE `post_id` = %s ORDER BY `created_at` DESC"
+            """
+            SELECT comments.*, 
+                JSON_OBJECT(
+                    'id', users.id,
+                    'account_name', users.account_name,
+                    'passhash', users.passhash,
+                    'authority', users.authority,
+                    'del_flg', users.del_flg,
+                    'created_at', users.created_at
+                ) AS user
+            FROM comments
+            JOIN users on users.id = comments.user_id
+            WHERE comments.post_id = %s
+            ORDER BY comments.created_at DESC
+            """
         )
         if not all_comments:
             query += " LIMIT 3"
 
         cursor.execute(query, (post["id"],))
         comments = list(cursor)
-        for comment in comments:
-            cursor.execute(
-                "SELECT * FROM `users` WHERE `id` = %s", (comment["user_id"],)
-            )
-            comment["user"] = cursor.fetchone()
+        # for comment in comments:
+        #     cursor.execute(
+        #         "SELECT * FROM `users` WHERE `id` = %s", (comment["user_id"],)
+        #     )
+        #     comment["user"] = cursor.fetchone()
         comments.reverse()
         post["comments"] = comments
 
@@ -521,18 +536,18 @@ app.wsgi_app = ProfilerMiddleware(
     filename_format="profile.log",
 )
 
-# # line_profilerを用いたラインプロファイリング
-# # デバッグと併用できないので、利用は非推奨
-# filters = [
-#     FilenameFilter(__file__),
-#     lambda stats: filter(lambda stat: stat.total_time > 0.1, stats),
-# ]
-# app.wsgi_app = LineProfilerMiddleware(
-#     app.wsgi_app,
-#     stream=open("/var/log/python/profile_wlreporter.log", "a"),  # TODO: closeしていない
-#     filters=filters,
-#     async_stream=True,
-# )
+# line_profilerを用いたラインプロファイリング
+# デバッグと併用できないので、利用は非推奨
+filters = [
+    FilenameFilter(__file__),
+    lambda stats: filter(lambda stat: stat.total_time > 0.1, stats),
+]
+app.wsgi_app = LineProfilerMiddleware(
+    app.wsgi_app,
+    stream=open("/var/log/python/profile_wlreporter.log", "a"),  # TODO: closeしていない
+    filters=filters,
+    async_stream=True,
+)
 
 
 if __name__ == "__main__":
