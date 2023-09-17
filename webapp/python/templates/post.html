@@ -19,7 +19,7 @@
 
     {% for comment in post['comments'] %}
     <div class="isu-comment">
-      <a href="/@{{ comment['user']['account_name'] | urlencode }}" class="isu-comment-account-name">{{ comment['user']['account_name'] }}</a>
+      <a href="/@{{ comment['account_name'] | urlencode }}" class="isu-comment-account-name">{{ comment['account_name'] }}</a>
       <span class="isu-comment-text">{{ comment['comment'] }}</span>
     </div>
     {% endfor %}

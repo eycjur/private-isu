@@ -142,10 +142,7 @@ def make_posts(results, all_comments=False):
         query = (
             # "SELECT * FROM `comments` WHERE `post_id` = %s ORDER BY `created_at` DESC"
             """
-            SELECT comments.*, 
-                JSON_OBJECT(
-                    'account_name', users.account_name
-                ) AS user
+            SELECT comments.*, users.account_name
             FROM comments
             JOIN users on users.id = comments.user_id
             WHERE comments.post_id = %s
